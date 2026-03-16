@@ -44,11 +44,6 @@ int* getBiggestThree(int** items, int h, int* ww, int* sizeOfReturn) { // поч
             rg++; cg++;
         }
     }
-    printf("Grid:\n");
-    for (int i=0; i<w*h; i++) {
-        if (i%w == 0) printf("\n");
-        printf("%d ", items[i/w][i%w]);
-    } // дебаг
     
     for (int i=0; i<w*h; i++) {
         int x=i%w, y=i/w;
@@ -60,23 +55,27 @@ int* getBiggestThree(int** items, int h, int* ww, int* sizeOfReturn) { // поч
         int distVer = ((h-idxY-1)>idxY) ? idxY : (h-idxY-1);
         int maxR = (distVer>distHor) ? distHor : distVer; // поиск максимального радиуса ромба
 
-        for (int j=1; j<=maxR; j++) {
-            int plusTopMinusBot = items[y-j][x]-items[y+j][x]; // костыль + коммент снизу есть
-            int sumAtREqualsJ = getSumOfNeighborsAtDist(gds, pds, i, w, h, j)+plusTopMinusBot; // read gSONAD comment
-            maxForThisOne = (maxForThisOne<sumAtREqualsJ) ? sumAtREqualsJ : maxForThisOne;
+        for (int j=0; j<=maxR; j++) {
+            int sumAtREqualsJ;
+            if (j==0) { 
+                sumAtREqualsJ=val;
+            } else {
+                int plusTopMinusBot = items[y-j][x]-items[y+j][x]; // костыль + коммент снизу есть
+                sumAtREqualsJ = getSumOfNeighborsAtDist(gds, pds, i, w, h, j)+plusTopMinusBot; // read gSONAD comment
+            }
+            if (biggestFirst==sumAtREqualsJ || biggestSecond==sumAtREqualsJ || biggestThird==sumAtREqualsJ) { // нужно 3 различных максимальных найти
+            } else if (sumAtREqualsJ>biggestFirst) {
+                biggestThird=biggestSecond;
+                biggestSecond=biggestFirst;
+                biggestFirst=sumAtREqualsJ;
+            } else if (sumAtREqualsJ>biggestSecond) {
+                biggestThird=biggestSecond;
+                biggestSecond=sumAtREqualsJ;
+            } else if (sumAtREqualsJ>biggestThird) {
+                biggestThird=sumAtREqualsJ;
+            }
         }
 
-        if (biggestFirst==maxForThisOne || biggestSecond==maxForThisOne || biggestThird==maxForThisOne) { // нужно 3 различных максимальных найти
-        } else if (maxForThisOne>biggestFirst) {
-            biggestThird=biggestSecond;
-            biggestSecond=biggestFirst;
-            biggestFirst=maxForThisOne;
-        } else if (maxForThisOne>biggestSecond) {
-            biggestThird=biggestSecond;
-            biggestSecond=maxForThisOne;
-        } else if (maxForThisOne>biggestThird) {
-            biggestThird=maxForThisOne;
-        }
     } 
 
     free(gds);
