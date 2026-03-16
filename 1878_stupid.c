@@ -13,20 +13,20 @@ int getSumOfNeighborsAtDist(int* gds, int* pds, int self, int w, int h, int r) {
     return ans;
 }
 
-int* getBiggestThree(int** items, int h, int* ww, int* sizeOfReturn) {
-    int w=ww[0];
+int* getBiggestThree(int** items, int h, int* ww, int* sizeOfReturn) { // почему нельзя было нормальный одномерный массив дать
+    int w=ww[0]; // костыль от литкода
     int biggestFirst=-1e5, biggestSecond=-1e5, biggestThird=-1e5;
-    int* gds = (int*)malloc(w*h*sizeof(int));
+    int* gds = (int*)malloc(w*h*sizeof(int)); // префиксные по диагонали вправо-вниз
     if (gds==NULL) {
         return NULL;
     }
-    int* pds = (int*)malloc(w*h*sizeof(int));
+    int* pds = (int*)malloc(w*h*sizeof(int)); // префиксные по диагонали влево-вниз 
     if (pds==NULL) {
         free(gds);
         return NULL;
     }
     
-    for (int dc=0; dc<(w+h-1); dc++) {
+    for (int dc=0; dc<(w+h-1); dc++) { // заполняем. я руками на питоне это перебрал для последнего теста, оно сошлось.
         int rg,cg;
         if (dc<w) {
             rg=0;
@@ -48,7 +48,7 @@ int* getBiggestThree(int** items, int h, int* ww, int* sizeOfReturn) {
     for (int i=0; i<w*h; i++) {
         if (i%w == 0) printf("\n");
         printf("%d ", items[i/w][i%w]);
-    }
+    } // дебаг
     
     for (int i=0; i<w*h; i++) {
         int x=i%w, y=i/w;
@@ -58,15 +58,15 @@ int* getBiggestThree(int** items, int h, int* ww, int* sizeOfReturn) {
         int idxX=i%w, idxY=i/w;
         int distHor = ((w-idxX-1)>idxX) ? idxX : (w-idxX-1);
         int distVer = ((h-idxY-1)>idxY) ? idxY : (h-idxY-1);
-        int maxR = (distVer>distHor) ? distHor : distVer;
+        int maxR = (distVer>distHor) ? distHor : distVer; // поиск максимального радиуса ромба
 
         for (int j=1; j<=maxR; j++) {
-            int plusTopMinusBot = items[y-j][x]-items[y+j][x];
+            int plusTopMinusBot = items[y-j][x]-items[y+j][x]; // костыль + коммент снизу есть
             int sumAtREqualsJ = getSumOfNeighborsAtDist(gds, pds, i, w, h, j)+plusTopMinusBot; // read gSONAD comment
             maxForThisOne = (maxForThisOne<sumAtREqualsJ) ? sumAtREqualsJ : maxForThisOne;
         }
 
-        if (biggestFirst==maxForThisOne || biggestSecond==maxForThisOne || biggestThird==maxForThisOne) {
+        if (biggestFirst==maxForThisOne || biggestSecond==maxForThisOne || biggestThird==maxForThisOne) { // нужно 3 различных максимальных найти
         } else if (maxForThisOne>biggestFirst) {
             biggestThird=biggestSecond;
             biggestSecond=biggestFirst;
@@ -77,11 +77,11 @@ int* getBiggestThree(int** items, int h, int* ww, int* sizeOfReturn) {
         } else if (maxForThisOne>biggestThird) {
             biggestThird=maxForThisOne;
         }
-    }
+    } 
 
     free(gds);
     free(pds);
-
+// хуйня чтобы ретурнить маллок переменного размера. поверьте что работает, так как ломается не на нем
     int ansQ[3]={biggestFirst,biggestSecond,biggestThird};
     int isChanged=0, al=0;
     for (int i=0; i<3; i++) {
@@ -103,7 +103,7 @@ int* getBiggestThree(int** items, int h, int* ww, int* sizeOfReturn) {
     return answer;
 }
 
-int main() {
+int main() { // не рассчитан на 2д аррай, свои тесты делал для 1д, но пришлось переписать на 2д. крч хуета
     int w=3,h=1;
     int hh[1] = 3;
     int* itemsRows=NULL;
