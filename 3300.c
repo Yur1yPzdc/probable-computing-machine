@@ -16,3 +16,7 @@ int minElement(int* nums, int numsSize) {
     }
     return min;
 }
+
+int main() {
+	return 0;
+}
