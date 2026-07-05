@@ -1,7 +1,7 @@
 #![warn(clippy::pedantic)]
 #![allow(dead_code)]
 
-struct Solution;
+pub struct Solution;
 
 impl Solution {
     pub fn rob(nums: Vec<i32>) -> i32 {
@@ -63,6 +63,41 @@ impl Solution {
 
         return ans;
     }
+
+    pub fn find_repeated_dna_sequences(s: String) -> Vec<String> {
+        use std::collections::HashSet;
+        if s.len() < 11 { return Vec::<String>::new() }
+
+        let mut check = HashSet::<String>::new();
+        let mut ans = HashSet::<String>::new();
+        for i in 0..=(s.len()-10) {
+            let curr = s[i..i+10].to_string();
+            if !check.insert(curr.clone()) {
+                ans.insert(curr.clone());
+            }
+        }
+
+        return ans.into_iter().collect::<Vec<_>>();
+    }
+
+    pub fn can_jump(nums: Vec<i32>) -> bool {
+        let n = nums.len();
+
+        let mut max_idx = 0;
+
+        for ( idx, val ) in nums.iter().enumerate() {
+            // is curr cell further that max_reachable?
+            if idx > max_idx { return false; }
+
+            // max_reachable = either self or curr cell + its value
+            max_idx = max_idx.max(idx + *val as usize);
+
+            // is max_reach further or same as last cell?
+            if (max_idx+1) >= n { return true; }
+        }
+
+        return false;
+    }
 }
 
 #[cfg(test)]
@@ -70,6 +105,18 @@ mod tests {
     use std::collections::HashSet;
 
     use super::Solution;
+
+    #[test]
+    fn case1_55() {
+        let nums = vec![2,3,1,1,4];
+        assert_eq!(Solution::can_jump(nums), true);
+    }
+
+    #[test]
+    fn case2_55() {
+        let nums = vec![3,2,1,0,4];
+        assert_eq!(Solution::can_jump(nums), false);
+    }
     
     #[test]
     fn case1_198() {
@@ -114,6 +161,22 @@ mod tests {
         let supplies = vec!["yeast".to_string(), "meat".to_string(), "flour".to_string()];
         let expected = HashSet::<String>::from_iter(recipes.clone());
         let ans = HashSet::from_iter(Solution::find_all_recipes(recipes, ingredients, supplies));
+        assert_eq!(ans.symmetric_difference(&expected).count(), 0);
+    }
+
+    #[test]
+    fn case1_187() {
+        let s = "AAAAACCCCCAAAAACCCCCCAAAAAGGGTTT".to_string();
+        let expected = HashSet::<String>::from_iter(vec!["AAAAACCCCC".to_string(),"CCCCCAAAAA".to_string()]);
+        let ans = HashSet::from_iter(Solution::find_repeated_dna_sequences(s));
+        assert_eq!(ans.symmetric_difference(&expected).count(), 0);
+    }
+
+    #[test]
+    fn case2_187() {
+        let s = "AAAAAAAAAAA".to_string();
+        let expected = HashSet::<String>::from_iter(vec!["AAAAAAAAAA".to_string()]);
+        let ans = HashSet::from_iter(Solution::find_repeated_dna_sequences(s));
         assert_eq!(ans.symmetric_difference(&expected).count(), 0);
     }
 }
